@@ -14,19 +14,20 @@ BASE_URL = ('https://flysmartavia.com/search/'
             )
 
 
-def get_url_smartavia(date, departure=f'{AIRPORT_CODES["СПБ"]}',
-                      arrive=f'{AIRPORT_CODES["Сочи"]}'):
+def get_url_smartavia(date, dep_air, arr_air):
+    departure = AIRPORT_CODES[dep_air]
+    arrive = AIRPORT_CODES[arr_air]
     url_smartavia = BASE_URL + departure + '-' + date + '-' + arrive + '-' + '1'
     return url_smartavia
 
 
-def get_driver(date):
+def get_driver(date, dep_air, arr_air):
     service = Service(executable_path=ChromeDriverManager().install())
     options = webdriver.ChromeOptions()
     options.add_argument('--headless')
     options.add_argument('--disable-gpu')
     driver = webdriver.Chrome(service=service, options=options)
-    driver.get(get_url_smartavia(date))
+    driver.get(get_url_smartavia(date, dep_air, arr_air))
     time.sleep(1)
     return driver
 
@@ -38,12 +39,11 @@ def get_soup(driver):
     return soup
 
 
-def get_5_days_flights(driver_chrome, soup_beauty):
+def get_5_days_flights(driver_chrome, soup_beauty, flights):
     h_wrapper = driver_chrome.find_element(By.CLASS_NAME, 'calendar-h-wrapper')
     link = h_wrapper.find_elements(By.CLASS_NAME, 'day-wrapper')
     price = soup_beauty.find_all('span', {'class': 'day-label'})
     day = soup_beauty.find_all('span', {'class': 'day'})
-    flights = 'Питер - Сочи:\n'
     for i in range(len(link)):
         flights += f'{day[i].text} - {price[i].text.lstrip("от ")}\n'
     flights += f'\n{link[2].get_attribute("href")}'
@@ -60,7 +60,9 @@ def get_one_day_flight(driver_chrome):
 
 
 if __name__ == '__main__':
-    print(get_5_days_flights(get_driver('2807'), get_soup(get_driver('2807'))))
+    print(get_5_days_flights(get_driver('2807', 'СПБ', 'Сочи'),
+                             get_soup(get_driver('2807', 'СПБ', 'Сочи')),
+                             'spb'))
     # get_one_day_flight(driver)
     # time.sleep(4)
     # driver.quit()
