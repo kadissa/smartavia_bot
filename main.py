@@ -7,7 +7,6 @@ from aiogram.types import KeyboardButton, ReplyKeyboardMarkup, Message
 from dotenv import load_dotenv
 
 from smartavia_parser import *
-from passengers import Passenger
 
 load_dotenv()
 button1 = KeyboardButton(text='Сочи-СПБ')
@@ -32,7 +31,8 @@ passengers_dict = {}
 
 @dp.message(CommandStart())
 async def start(message: Message):
-    await message.answer(text='Welcome to smartavia bot',
+    await message.answer(text='Welcome to smartavia bot\n Пользуйтесь '
+                              'кнопками и подсказками на экране',
                          reply_markup=keyboard)
 
 
@@ -40,21 +40,21 @@ async def start(message: Message):
 @dp.message(F.text == 'СПБ-Сочи')
 async def get_flight_data(message: Message):
     passengers_dict[message.from_user.id] = message.text
-
-    print(passengers_dict)
-    Passenger(message.from_user.first_name, message.from_user.id)
-    await message.answer('введите желаемую дату вылета:\nчисло и месяц без '
-                         'пробелов',
+    await message.answer('введите желаемую дату вылета: 🛫️\nчисло и месяц',
                          reply_markup=keyboard)
 
 
-@dp.message(lambda message: message.text.isdigit(), F.text.len() == 4)
+# @dp.message(lambda message: message.text.isdigit(), F.text.len() == 4)
+@dp.message(F.text.regexp(r'\d\d\W\d\d'))
+@dp.message(F.text.regexp(r'\d\d\d\d'))
 async def send_flights(message: Message):
     date = message.text
-    direction = f'{passengers_dict.get(message.from_user.id)}\n'
-    print(direction)
+    if len(date) == 5:
+        date = date[:2] + date[3:]
     dep_air = passengers_dict.get(message.from_user.id).split('-')[0]
     arrive_air = passengers_dict.get(message.from_user.id).split('-')[1]
+    direction = (f'✈️    🌆️{dep_air}-{arrive_air}🏝️\n' if arrive_air == 'Сочи'
+                 else f'✈️    🏝️{dep_air}-{arrive_air}🌆️\n')
     await message.answer(
         text=get_5_days_flights(get_driver(date, dep_air, arrive_air),
                                 get_soup(
@@ -64,17 +64,10 @@ async def send_flights(message: Message):
         reply_markup=keyboard)
 
 
-@dp.message(lambda message: message.text.isdigit(), F.text.len() != 4)
-async def send_flights(message: Message):
-    await message.answer(text='Нужно ввести дату в формате 2506, где 25 - '
-                              'это день, 06 - это месяц',
-                         reply_markup=keyboard)
-
-
 @dp.message()
 async def send_flights(message: Message):
     await message.answer(text='Нужно ввести дату в формате 2506, где 25 - '
-                              'это день, 06 - это месяц!',
+                              'это день, 06 - это месяц❗️',
                          reply_markup=keyboard)
 
 
