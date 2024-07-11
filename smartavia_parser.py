@@ -16,8 +16,9 @@ BASE_URL = ('https://flysmartavia.com/search/'
 
 def get_url_smartavia(date, dep_air, arr_air):
     departure = AIRPORT_CODES[dep_air]
-    arrive = AIRPORT_CODES[arr_air]
-    url_smartavia = BASE_URL + departure + '-' + date + '-' + arrive + '-' + '1'
+    arrival = AIRPORT_CODES[arr_air]
+    url_smartavia = (BASE_URL + departure + '-' + date + '-' + arrival + '-'
+                     + '1')
     return url_smartavia
 
 
