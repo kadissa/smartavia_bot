@@ -24,7 +24,7 @@ keyboard_date = ReplyKeyboardMarkup(
 keyboard_direction = ReplyKeyboardMarkup(
     keyboard=[[button1, button2], [button3]],
     resize_keyboard=True,
-    input_field_placeholder='Спб Сочи',
+    input_field_placeholder='спб сочи',
     one_time_keyboard=True)
 
 bot = Bot(token=os.getenv('TELEGRAM_TOKEN_TRAINING_BOT'))
@@ -36,9 +36,11 @@ passengers_dict = {}
 
 @dp.message(CommandStart())
 async def start(message: Message):
+    # await bot.send_chat_action(chat_id=message.from_user.id, action="typing",)
     await message.answer(text='Welcome to smartavia bot\n Пользуйтесь '
                               'кнопками и подсказками на экране',
-                         reply_markup=keyboard_date)
+                         reply_markup=keyboard_date
+                         )
 
 
 @dp.message(F.text == 'Выбрать направление')
@@ -51,13 +53,23 @@ async def request_direction(message: Message):
 @dp.message(F.text == 'Сочи СПБ')
 @dp.message(F.text == 'СПБ Сочи')
 async def get_flight_data(message: Message):
-    passengers_dict[message.from_user.id] = message.text
-    await message.answer('введите желаемую дату вылета: 🛫️\nчисло и месяц',
-                         reply_markup=keyboard_date)
+    if not all(city.title() in AIRPORT_CODES for city in message.text.split()):
+        for city in message.text.split():
+            print(f'city: {city.title()}')
+            if city.title() not in AIRPORT_CODES:
+                await message.answer(f'В городе {city} нет аэропорта, '
+                                     f'попробуйте ещё раз.',
+                                     reply_markup=keyboard_direction)
+    else:
+        passengers_dict[message.from_user.id] = message.text
+        await message.answer('введите желаемую дату вылета: 🛫️\nчисло и месяц',
+                             reply_markup=keyboard_date)
 
 
-@dp.message(F.text.regexp(r'\d\d\W\d\d'))
-@dp.message(F.text.regexp(r'\d\d\d\d'))
+# @dp.message(F.text.regexp(r'\d\d\W\d\d'))
+# @dp.message(F.text.regexp(r'\d\d\d\d'))
+@dp.message(F.text.regexp(r'(0[1-9]|[12][0-9]|3[01])(0[1-9]|1[012])'))
+@dp.message(F.text.regexp(r'(0[1-9]|[12][0-9]|3[01])\W(0[1-9]|1[012])'))
 async def send_flights(message: Message):
     date = message.text
     if len(date) == 5:
@@ -72,9 +84,6 @@ async def send_flights(message: Message):
         direction = f'✈️    🏝️{dep_air}-{arrive_air}🌆️\n'
     else:
         direction = f'✈️    {dep_air}-{arrive_air}\n'
-
-    # direction = (f'✈️    🌆️{dep_air}-{arrive_air}🏝️\n' if arrive_air == 'Сочи'
-    #              else f'✈️    🏝️{dep_air}-{arrive_air}🌆️\n')
     await message.answer(
         text=get_5_days_flights(get_driver(date, dep_air, arrive_air),
                                 get_soup(
@@ -84,11 +93,17 @@ async def send_flights(message: Message):
         reply_markup=keyboard_date)
 
 
-@dp.message()
+@dp.message(F.text.regexp(r'\d'))
 async def send_flights(message: Message):
     await message.answer(text='Нужно ввести дату в формате 2506, где 25 - '
                               'это день, 06 - это месяц❗️',
                          reply_markup=keyboard_date)
+
+
+@dp.message(F.text.regexp(r'[a-zA-Z]'))
+async def send_flights(message: Message):
+    await message.answer(text='Можно вводить только кириллические символы❗️',
+                         reply_markup=keyboard_direction)
 
 
 if __name__ == '__main__':
