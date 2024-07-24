@@ -1,3 +1,4 @@
+import logging
 import time
 
 from bs4 import BeautifulSoup
@@ -8,6 +9,14 @@ from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
 
 from airports_airlines import *
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.WARNING)
+handler = logging.FileHandler(f"{__name__}.log", mode='a')
+formatter = logging.Formatter(
+    '%(asctime)s - %(levelname)s - %(message)s'
+)
+handler.setFormatter(formatter)
+logger.addHandler(handler)
 
 BASE_URL = ('https://flysmartavia.com/search/'
             # 'LED-1001-AER-1'
@@ -19,6 +28,7 @@ def get_url_smartavia(date, dep_air, arr_air):
     arrival = AIRPORT_CODES[arr_air]
     url_smartavia = (BASE_URL + departure + '-' + date + '-' + arrival + '-'
                      + '1')
+    logger.info(f'url_smartavia={url_smartavia}')
     return url_smartavia
 
 
@@ -30,14 +40,11 @@ def get_driver(date, dep_air, arr_air):
     driver = webdriver.Chrome(service=service, options=options)
     driver.get(get_url_smartavia(date, dep_air, arr_air))
     time.sleep(1)
-    return driver
-
-
-def get_soup(driver):
-    soup = BeautifulSoup(driver.page_source, features='lxml')
-    time.sleep(2)
-    driver.quit()
-    return soup
+    soup = BeautifulSoup(driver.page_source, features="lxml")
+    time.sleep(1)
+    logger.warning(f'driver={str(driver)}')
+    logger.warning(f'soup={soup.get_text()[:30]}')
+    return driver, soup
 
 
 def get_5_days_flights(driver_chrome, soup_beauty, flights):
@@ -51,19 +58,11 @@ def get_5_days_flights(driver_chrome, soup_beauty, flights):
     return flights
 
 
-def get_one_day_flight(driver_chrome):
-    row = driver_chrome.find_element(By.CLASS_NAME, 'row')
-    date_time = row.find_element(By.CLASS_NAME, 'inner')
-    price = row.find_element(By.CLASS_NAME, 'button-wrapper')
-
-    print(date_time.text)
-    print(price.text.lstrip('от'))
-
-
 if __name__ == '__main__':
-    print(get_5_days_flights(get_driver('2807', 'СПБ', 'Сочи'),
-                             get_soup(get_driver('2807', 'СПБ', 'Сочи')),
-                             'spb'))
-    # get_one_day_flight(driver)
-    # time.sleep(4)
-    # driver.quit()
+    print(
+        get_5_days_flights(
+            get_driver('2807', 'СПБ', 'Сочи')[0],
+            get_driver('2807', 'СПБ', 'Сочи')[1],
+            'spb'
+        ),
+    )
