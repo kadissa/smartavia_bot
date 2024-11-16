@@ -39,7 +39,7 @@ def get_driver(date, dep_air, arr_air):
     options.add_argument('--disable-gpu')
     driver = webdriver.Chrome(service=service, options=options)
     driver.get(get_url_smartavia(date, dep_air, arr_air))
-    time.sleep(1)
+    time.sleep(4)
     soup = BeautifulSoup(driver.page_source, features="lxml")
     time.sleep(1)
     logger.warning(f'driver={str(driver)}')
@@ -61,8 +61,8 @@ def get_5_days_flights(driver_chrome, soup_beauty, flights):
 if __name__ == '__main__':
     print(
         get_5_days_flights(
-            get_driver('2807', 'СПБ', 'Сочи')[0],
-            get_driver('2807', 'СПБ', 'Сочи')[1],
+            get_driver('2412', 'СПБ', 'Сочи')[0],
+            get_driver('2412', 'СПБ', 'Сочи')[1],
             'spb'
         ),
     )
