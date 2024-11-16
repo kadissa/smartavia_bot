@@ -3,12 +3,12 @@ import time
 
 from bs4 import BeautifulSoup
 from selenium import webdriver
-# Импортируем классы для Chrome. Если у вас другой браузер - измените импорт.
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
 
 from airports_airlines import *
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.WARNING)
 handler = logging.FileHandler(f"{__name__}.log", mode='a')
@@ -58,7 +58,7 @@ def get_5_days_flights(driver_chrome, soup_beauty, flights):
     return flights
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # for debugging
     print(
         get_5_days_flights(
             get_driver('2412', 'СПБ', 'Сочи')[0],
