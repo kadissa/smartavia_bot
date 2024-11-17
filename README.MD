@@ -49,13 +49,13 @@ https://core.telegram.org/bots/tutorial
 2. Open project in your IDE, create file `.env` in the root directory
 
 3. Enter your TELEGRAM-TOKEN in `.env` (without space, without quotes)
-   ```js
-   TELEGRAM_TOKEN_TRAINING_BOT=YOUR_TELEGRAM-TOKEN;
+   ```
+   TELEGRAM_TOKEN_TRAINING_BOT=YOUR_TELEGRAM-TOKEN
    ```
 4. Install and run virtual environment. 
 5. Install dependency
-   ```azure
-    pip install -r requirements.txt;
+   ```
+    pip install -r requirements.txt
    ```
 6. Change git remote url to avoid accidental pushes to base project
    ```sh
