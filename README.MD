@@ -5,7 +5,7 @@
   <p align="center">
     project_description
     <br />
-    <strong style="color: bisque">Bot looking for air tickets</strong>
+    <strong style="color: deepskyblue">Bot looking for air tickets</strong>
     <br />
     <br />
   </p>
