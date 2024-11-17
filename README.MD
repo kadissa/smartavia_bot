@@ -57,11 +57,7 @@ https://core.telegram.org/bots/tutorial
    ```
     pip install -r requirements.txt
    ```
-6. Change git remote url to avoid accidental pushes to base project
-   ```sh
-   git remote set-url origin github_username/repo_name
-   git remote -v # confirm the changes
-   ```
+6. Run ```main.py```
 
 
 
