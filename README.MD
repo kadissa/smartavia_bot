@@ -5,8 +5,7 @@
   <p align="center">
     project_description
     <br />
-    <a href="https://github.com/github_username/repo_name"><strong>Bot looking for air tickets</strong
-></a>
+    <strong style="color: bisque">Bot looking for air tickets</strong>
     <br />
     <br />
   </p>
