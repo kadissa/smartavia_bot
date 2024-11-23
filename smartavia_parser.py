@@ -40,6 +40,8 @@ def get_driver(date, dep_air, arr_air):
     driver = webdriver.Chrome(service=service, options=options)
     driver.get(get_url_smartavia(date, dep_air, arr_air))
     time.sleep(4)
+    if '403' in driver.title:
+        return '403', 'forbidden'
     soup = BeautifulSoup(driver.page_source, features="lxml")
     time.sleep(1)
     logger.warning(f'driver={str(driver)}')
@@ -47,8 +49,11 @@ def get_driver(date, dep_air, arr_air):
     return driver, soup
 
 
-def get_5_days_flights(driver_chrome, soup_beauty, flights):
-    h_wrapper = driver_chrome.find_element(By.CLASS_NAME, 'calendar-h-wrapper')
+def get_5_days_flights(driver_chrome, soup_beauty, flights: str) -> str:
+    current_web_page = driver_chrome
+    if '403' in current_web_page:
+        return 'Смарт-авиа закрыла доступ через Selenium'
+    h_wrapper = current_web_page.find_element(By.CLASS_NAME, 'calendar-h-wrapper')
     link = h_wrapper.find_elements(By.CLASS_NAME, 'day-wrapper')
     price = soup_beauty.find_all('span', {'class': 'day-label'})
     day = soup_beauty.find_all('span', {'class': 'day'})
