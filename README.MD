@@ -1,6 +1,6 @@
 <div align="center">
 
-<h3 align="center">SmartaviaTelegramBot</h3>
+<h3 align="center">AviaTelegramBot</h3>
 
   <p align="center">
     project_description
@@ -19,7 +19,7 @@
 
 ## About The Project
 
-The project produces a parsing of the Smartavia-site, 
+The project produces a parsing of the Smartavia-site, Aeroflot-site,
 checks availability and price of tickets on the given date.
 
 

@@ -1,5 +1,5 @@
 import os
-
+import datetime
 from aiogram import F, Dispatcher, Bot
 from aiogram.filters import CommandStart
 from aiogram.types import KeyboardButton, ReplyKeyboardMarkup, Message
@@ -11,14 +11,20 @@ load_dotenv()
 button1 = KeyboardButton(text='Сочи СПБ')
 button2 = KeyboardButton(text='СПБ Сочи')
 button3 = KeyboardButton(text='Выбрать направление')
+button_aeroflot = KeyboardButton(text='Аэрофлот')
+button_smartavia = KeyboardButton(text='Смартавиа')
 
 keyboard_date = ReplyKeyboardMarkup(
-    keyboard=[[button1, button2], [button3]],
+    keyboard=[[button1, button2],
+              [button3],
+              [button_smartavia, button_aeroflot]],
     resize_keyboard=True,
     input_field_placeholder='ддмм',
     one_time_keyboard=True)
 keyboard_direction = ReplyKeyboardMarkup(
-    keyboard=[[button1, button2], [button3]],
+    keyboard=[[button1, button2],
+              [button3],
+              [button_smartavia, button_aeroflot]],
     resize_keyboard=True,
     input_field_placeholder='москва минск',
     one_time_keyboard=True)
@@ -39,8 +45,18 @@ async def start(message: Message):
 
 @dp.message(F.text == 'Выбрать направление')
 async def request_direction(message: Message):
-    await message.answer('Введите пункт отправления и пункт назначения, '
-                         'через пробел', reply_markup=keyboard_direction)
+    await message.answer('Введите пункт отправления и пункт назначения '
+                         'через пробел или выберите в меню.',
+                         reply_markup=keyboard_direction)
+
+
+@dp.message(F.text == 'Аэрофлот')
+@dp.message(F.text == 'Смартавиа')
+async def get_air_company(message: Message):
+    passengers_dict[message.from_user.username] = message.text
+    await message.answer('Введите пункт отправления и пункт назначения '
+                         'через пробел или выберите в меню.',
+                         reply_markup=keyboard_direction)
 
 
 @dp.message(F.text.regexp(r'[А-Яа-яЁё-]+ [А-Яа-яЁё-]+'))
@@ -78,11 +94,19 @@ async def send_flights(message: Message):
         direction = f'✈️    🏝️{dep_air}-{arrive_air}🌆️\n'
     else:
         direction = f'✈️    {dep_air}-{arrive_air}\n'
-    driver_chrome, soup_beauty = get_driver(date, dep_air, arrive_air)
-    await message.answer(
-        text=get_5_days_flights(driver_chrome, soup_beauty, direction),
-        reply_markup=keyboard_date
-    )
+    if passengers_dict.get(message.from_user.username) == 'Аэрофлот':
+        url = AEROFLOT_URL
+        current_date = str(datetime.date.today().year) + date[2:] + date[:2]
+        await message.answer(
+            # text=seven_days_aeroflot(url, current_date, dep_air, arrive_air)
+            text=one_day_aeroflot(url, current_date, dep_air, arrive_air)
+        )
+    else:
+        url = SMARTAVIA_URL
+        await message.answer(
+            text=five_days_smartavia(url, date, dep_air, arrive_air,direction),
+            reply_markup=keyboard_date
+        )
 
 
 @dp.message(F.text.regexp(r'\d'))
