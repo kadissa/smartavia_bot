@@ -52,6 +52,7 @@ async def request_direction(message: Message):
 @dp.message(F.text == 'Аэрофлот')
 @dp.message(F.text == 'Смартавиа')
 async def get_air_company(message: Message):
+    global passengers_dict
     passengers_dict[message.from_user.username] = message.text
     await message.answer('Введите пункт отправления и пункт назначения '
                          'через пробел или выберите в меню.',
@@ -62,6 +63,7 @@ async def get_air_company(message: Message):
 @dp.message(F.text == 'Сочи СПБ')
 @dp.message(F.text == 'СПБ Сочи')
 async def get_flight_data(message: Message):
+    global passengers_dict
     if not all(city.title() in AIRPORT_CODES for city in message.text.split()):
         for city in message.text.split():
             if city.title() not in AIRPORT_CODES:
@@ -79,6 +81,7 @@ async def get_flight_data(message: Message):
 @dp.message(F.text.regexp(r'(0[1-9]|[12][0-9]|3[01])(0[1-9]|1[012])'))
 @dp.message(F.text.regexp(r'(0[1-9]|[12][0-9]|3[01])\W(0[1-9]|1[012])'))
 async def send_flights(message: Message):
+    global passengers_dict
     date = message.text
     if len(date) == 5:
         date = date[:2] + date[3:]
