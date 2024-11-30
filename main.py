@@ -1,5 +1,4 @@
 import os
-import datetime
 from aiogram import F, Dispatcher, Bot
 from aiogram.filters import CommandStart
 from aiogram.types import KeyboardButton, ReplyKeyboardMarkup, Message
